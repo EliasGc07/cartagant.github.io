@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Project - Pruebas QA OSPOS</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #f3f2f1;
+            font-size: 11px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #d1d1d1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: #0078d4;
+            color: white;
+            padding: 12px 20px;
+            border-bottom: 1px solid #106ebe;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            margin: 3px 0 0 0;
+            opacity: 0.95;
+            font-size: 11px;
+        }
+        
+        .project-info {
+            background: #faf9f8;
+            padding: 12px 20px;
+            border-bottom: 1px solid #edebe9;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #323130;
+            font-size: 10px;
+            margin-bottom: 2px;
+        }
+        
+        .info-value {
+            color: #605e5c;
+            font-size: 11px;
+        }
+        
+        .toolbar {
+            background: #f8f8f8;
+            padding: 8px 20px;
+            border-bottom: 1px solid #d1d1d1;
+            font-size: 10px;
+            color: #605e5c;
+        }
+        
+        .gantt-container {
+            overflow-x: auto;
+        }
+        
+        .gantt-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1400px;
+        }
+        
+        .gantt-table th,
+        .gantt-table td {
+            border: 1px solid #d1d1d1;
+            padding: 4px 8px;
+            text-align: left;
+            font-size: 10px;
+            height: 22px;
+        }
+        
+        .gantt-table th {
+            background: #f8f8f8;
+            font-weight: 600;
+            color: #323130;
+            text-align: center;
+        }
+        
+        .task-column {
+            width: 280px;
+            text-align: left !important;
+        }
+        
+        .duration-column {
+            width: 60px;
+            text-align: center !important;
+        }
+        
+        .start-column, .finish-column {
+            width: 80px;
+            text-align: center !important;
+        }
+        
+        .progress-column {
+            width: 50px;
+            text-align: center !important;
+        }
+        
+        .task-name {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .task-id {
+            color: #605e5c;
+            font-weight: normal;
+            min-width: 20px;
+        }
+        
+        .task-text {
+            font-weight: 500;
+            color: #323130;
+        }
+        
+        .phase-header {
+            background: #e1f5fe !important;
+            font-weight: 600 !important;
+            color: #0277bd !important;
+        }
+        
+        .phase-header .task-text {
+            color: #0277bd !important;
+            font-weight: 600 !important;
+        }
+        
+        .sub-task {
+            padding-left: 20px;
+        }
+        
+        .sub-sub-task {
+            padding-left: 40px;
+        }
+        
+        .date-header {
+            background: #0078d4 !important;
+            color: white !important;
+            font-weight: 600;
+            writing-mode: vertical-lr;
+            text-orientation: mixed;
+            width: 25px;
+            font-size: 9px;
+        }
+        
+        .weekend {
+            background: #f3f2f1 !important;
+            color: #a19f9d;
+        }
+        
+        .task-bar {
+            height: 16px;
+            border-radius: 2px;
+            margin: 1px 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            font-size: 8px;
+            font-weight: 500;
+            color: white;
+            justify-content: center;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .phase-bar {
+            background: #0078d4;
+            border: 1px solid #106ebe;
+        }
+        
+        .functional-bar {
+            background: #107c10;
+            border: 1px solid #0e6b0e;
+        }
+        
+        .non-functional-bar {
+            background: #d83b01;
+            border: 1px solid #a52c00;
+        }
+        
+        .documentation-bar {
+            background: #8764b8;
+            border: 1px solid #6b4e9d;
+        }
+        
+        .planning-bar {
+            background: #0078d4;
+            border: 1px solid #106ebe;
+        }
+        
+        .gap {
+            background: #f8f8f8;
+            border: 1px dashed #d1d1d1;
+            color: #a19f9d;
+        }
+        
+        .progress-bar {
+            background: #f3f2f1;
+            border: 1px solid #d1d1d1;
+            height: 14px;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #107c10;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: #323130;
+            font-weight: 500;
+        }
+        
+        .milestone {
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid #d83b01;
+            margin: 2px auto;
+        }
+        
+        .dependency {
+            color: #605e5c;
+            font-size: 9px;
+        }
+        
+        .critical-path {
+            background: #d83b01 !important;
+            color: white !important;
+        }
+        
+        .summary-row {
+            background: #faf9f8;
+            border-top: 2px solid #0078d4;
+        }
+        
+        .notes {
+            background: #fff4e6;
+            border: 1px solid #ffb900;
+            border-radius: 4px;
+            padding: 12px;
+            margin: 15px 20px;
+            font-size: 10px;
+        }
+        
+        .notes h4 {
+            margin: 0 0 8px 0;
+            color: #d83b01;
+            font-size: 11px;
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 20px;
+            padding: 12px;
+            background: #faf9f8;
+            border: 1px solid #edebe9;
+            border-radius: 4px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 12px;
+            border-radius: 2px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Microsoft Project - Pruebas QA OSPOS</h1>
+            <p>Proyecto de Testing | Open Source Point of Sale System</p>
+        </div>
+        
+        <div class="project-info">
+            <div class="info-item">
+                <div class="info-label">FECHA INICIO</div>
+                <div class="info-value">Lun 16/06/2025</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">FECHA FINALIZACIÓN</div>
+                <div class="info-value">Mié 02/07/2025</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">DURACIÓN TOTAL</div>
+                <div class="info-value">17 días (12 días hábiles)</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">% COMPLETADO</div>
+                <div class="info-value">85% (En curso)</div>
+            </div>
+        </div>
+        
+        <div class="toolbar">
+            Vista: Diagrama de Gantt | Filtro: Todas las tareas | Ordenar por: ID | Mostrar: Ruta crítica
+        </div>
+        
+        <div class="gantt-container">
+            <table class="gantt-table">
+                <thead>
+                    <tr>
+                        <th class="task-column">Nombre de la Tarea</th>
+                        <th class="duration-column">Duración</th>
+                        <th class="start-column">Inicio</th>
+                        <th class="finish-column">Fin</th>
+                        <th class="progress-column">% Compl.</th>
+                        <th class="date-header">L 16</th>
+                        <th class="date-header">M 17</th>
+                        <th class="date-header">X 18</th>
+                        <th class="date-header">J 19</th>
+                        <th class="date-header">V 20</th>
+                        <th class="weekend">S 21</th>
+                        <th class="weekend">D 22</th>
+                        <th class="date-header">L 23</th>
+                        <th class="date-header">M 24</th>
+                        <th class="date-header">X 25</th>
+                        <th class="date-header">J 26</th>
+                        <th class="date-header">V 27</th>
+                        <th class="weekend">S 28</th>
+                        <th class="weekend">D 29</th>
+                        <th class="date-header">L 30</th>
+                        <th class="date-header">M 01</th>
+                        <th class="date-header">X 02</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- FASE 1: PLANIFICACIÓN -->
+                    <tr class="phase-header">
+                        <td class="task-name">
+                            <span class="task-id">1</span>
+                            <span class="task-text">🎯 FASE 1: PLANIFICACIÓN Y ANÁLISIS</span>
+                        </td>
+                        <td>3 días</td>
+                        <td>16/06/25</td>
+                        <td>18/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                                <div class="progress-text">100%</div>
+                            </div>
+                        </td>
+                        <td><div class="task-bar phase-bar">PLANIF</div></td>
+                        <td><div class="task-bar phase-bar">ANÁLISIS</div></td>
+                        <td><div class="task-bar phase-bar">PREP</div></td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-task">
+                            <span class="task-id">1.1</span>
+                            <span class="task-text">Análisis de requerimientos OSPOS</span>
+                        </td>
+                        <td>1 día</td>
+                        <td>16/06/25</td>
+                        <td>16/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                                <div class="progress-text">100%</div>
+                            </div>
+                        </td>
+                        <td><div class="task-bar planning-bar">REQ</div></td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-task">
+                            <span class="task-id">1.2</span>
+                            <span class="task-text">Configuración del entorno de pruebas</span>
+                        </td>
+                        <td>1 día</td>
+                        <td>17/06/25</td>
+                        <td>17/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                                <div class="progress-text">100%</div>
+                            </div>
+                        </td>
+                        <td></td>
+                        <td><div class="task-bar planning-bar">CONFIG</div></td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-task">
+                            <span class="task-id">1.3</span>
+                            <span class="task-text">Preparación de casos de prueba</span>
+                        </td>
+                        <td>1 día</td>
+                        <td>18/06/25</td>
+                        <td>18/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                                <div class="progress-text">100%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td>
+                        <td><div class="task-bar planning-bar">CASOS</div></td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    
+                    <!-- FASE 2: PRUEBAS FUNCIONALES -->
+                    <tr class="phase-header">
+                        <td class="task-name">
+                            <span class="task-id">2</span>
+                            <span class="task-text">⚙️ FASE 2: PRUEBAS FUNCIONALES</span>
+                        </td>
+                        <td>8 días</td>
+                        <td>19/06/25</td>
+                        <td>30/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%"></div>
+                                <div class="progress-text">85%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td>
+                        <td><div class="task-bar functional-bar">FUNC</div></td>
+                        <td><div class="task-bar functional-bar">PRUEBAS</div></td>
+                        <td></td><td></td>
+                        <td><div class="task-bar functional-bar">CONT</div></td>
+                        <td><div class="task-bar functional-bar">PRUEBAS</div></td>
+                        <td class="gap">---</td>
+                        <td><div class="task-bar functional-bar">FINAL</div></td>
+                        <td><div class="task-bar functional-bar">PRUEBAS</div></td>
+                        <td></td><td></td>
+                        <td><div class="task-bar functional-bar">COMP</div></td>
+                        <td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-task">
+                            <span class="task-id">2.1</span>
+                            <span class="task-text">Módulo de Ventas (Crítico)</span>
+                        </td>
+                        <td>2 días</td>
+                        <td>19/06/25</td>
+                        <td>20/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                                <div class="progress-text">100%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td>
+                        <td><div class="task-bar functional-bar critical-path">VENTA 1</div></td>
+                        <td><div class="task-bar functional-bar critical-path">VENTA 2</div></td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-sub-task">
+                            <span class="task-id">2.1.1</span>
+                            <span class="task-text">Proceso de venta básica</span>
+                        </td>
+                        <td>1 día</td>
+                        <td>19/06/25</td>
+                        <td>19/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                                <div class="progress-text">100%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td>
+                        <td><div class="task-bar functional-bar">BÁSICA</div></td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-sub-task">
+                            <span class="task-id">2.1.2</span>
+                            <span class="task-text">Aplicación de descuentos</span>
+                        </td>
+                        <td>1 día</td>
+                        <td>20/06/25</td>
+                        <td>20/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                                <div class="progress-text">100%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td><td></td>
+                        <td><div class="task-bar functional-bar">DESC</div></td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-task">
+                            <span class="task-id">2.2</span>
+                            <span class="task-text">Gestión de Inventario</span>
+                        </td>
+                        <td>2 días</td>
+                        <td>23/06/25</td>
+                        <td>24/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                                <div class="progress-text">100%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><div class="task-bar functional-bar">INV 1</div></td>
+                        <td><div class="task-bar functional-bar">INV 2</div></td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-task">
+                            <span class="task-id">2.3</span>
+                            <span class="task-text">Procesamiento de Pagos</span>
+                        </td>
+                        <td>1 día</td>
+                        <td>26/06/25</td>
+                        <td>26/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                                <div class="progress-text">100%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><div class="task-bar functional-bar">PAGOS</div></td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-task">
+                            <span class="task-id">2.4</span>
+                            <span class="task-text">Gestión de Clientes</span>
+                        </td>
+                        <td>1 día</td>
+                        <td>27/06/25</td>
+                        <td>27/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                                <div class="progress-text">100%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><div class="task-bar functional-bar">CLIE</div></td>
+                        <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-task">
+                            <span class="task-id">2.5</span>
+                            <span class="task-text">Otras funcionalidades</span>
+                        </td>
+                        <td>2 días</td>
+                        <td>30/06/25</td>
+                        <td>30/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%"></div>
+                                <div class="progress-text">75%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><div class="task-bar functional-bar">OTRAS</div></td>
+                        <td></td><td></td>
+                    </tr>
+                    
+                    <!-- FASE 3: PRUEBAS NO FUNCIONALES -->
+                    <tr class="phase-header">
+                        <td class="task-name">
+                            <span class="task-id">3</span>
+                            <span class="task-text">🔧 FASE 3: PRUEBAS NO FUNCIONALES</span>
+                        </td>
+                        <td>3 días</td>
+                        <td>25/06/25</td>
+                        <td>01/07/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 80%"></div>
+                                <div class="progress-text">80%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><div class="task-bar non-functional-bar">NO-FUNC</div></td>
+                        <td></td><td></td><td></td><td></td><td></td>
+                        <td><div class="task-bar non-functional-bar">FINAL</div></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-task">
+                            <span class="task-id">3.1</span>
+                            <span class="task-text">Pruebas de Rendimiento</span>
+                        </td>
+                        <td>1 día</td>
+                        <td>25/06/25</td>
+                        <td>25/06/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                                <div class="progress-text">100%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><div class="task-bar non-functional-bar">PERF</div></td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-task">
+                            <span class="task-id">3.2</span>
+                            <span class="task-text">Seguridad y Usabilidad</span>
+                        </td>
+                        <td>1 día</td>
+                        <td>01/07/25</td>
+                        <td>01/07/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 60%"></div>
+                                <div class="progress-text">60%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><div class="task-bar non-functional-bar">SEG</div></td>
+                        <td></td>
+                    </tr>
+                    
+                    <!-- FASE 4: DOCUMENTACIÓN -->
+                    <tr class="phase-header">
+                        <td class="task-name">
+                            <span class="task-id">4</span>
+                            <span class="task-text">📝 FASE 4: DOCUMENTACIÓN Y CIERRE</span>
+                        </td>
+                        <td>2 días</td>
+                        <td>01/07/25</td>
+                        <td>02/07/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 50%"></div>
+                                <div class="progress-text">50%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><div class="task-bar documentation-bar">DOC</div></td>
+                        <td><div class="task-bar documentation-bar">FINAL</div></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub-task">
+                            <span class="task-id">4.1</span>
+                            <span class="task-text">Reporte de errores encontrados</span>
+                        </td>
+                        <td>1 día</td>
+                        <td>01/07/25</td>
+                        <td>01/07/25</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 70%"></div>
+                                <div class="progress-text">70%</div>
+                            </div>
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><div class="task-bar documentation-bar">BUGS</div></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name sub
